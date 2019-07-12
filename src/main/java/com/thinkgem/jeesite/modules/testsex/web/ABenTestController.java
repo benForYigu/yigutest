@@ -121,7 +121,4 @@ public class ABenTestController extends BaseController {
 		return aBenTestService.getJedis(aBenTest);
 	}
 
-
-	//打个回车试一试
-
 }
