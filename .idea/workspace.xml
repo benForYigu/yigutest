@@ -9,7 +9,9 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="380b844c-70b5-4111-a785-6d6e35d4a9bd" name="Default" comment="" />
+    <list default="true" id="380b844c-70b5-4111-a785-6d6e35d4a9bd" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -260,17 +262,7 @@
     <panes>
       <pane id="PackagesPane" />
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="schoolappserver" type="b2602c69:ProjectViewProjectNode" />
-              <item name="schoolappserver" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -286,7 +278,7 @@
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -887,7 +879,7 @@
       <workItem from="1562736764114" duration="1378000" />
       <workItem from="1562738657634" duration="15366000" />
       <workItem from="1562806326710" duration="6264000" />
-      <workItem from="1562892971931" duration="908000" />
+      <workItem from="1562892971931" duration="1382000" />
     </task>
     <task id="LOCAL-00098" summary="宣讲时间段">
       <created>1554121526342</created>
@@ -1256,7 +1248,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2287133000" />
+    <option name="totallyTimeSpent" value="2287607000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
