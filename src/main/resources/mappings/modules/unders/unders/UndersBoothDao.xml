@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.unders.dao.unders.UndersBoothDao">
+    
+	<sql id="undersBoothColumns">
+		a.id AS "id",
+		a.unders_id AS "undersId.id",
+		a.img AS "img",
+		a.name AS "name",
+		a.number AS "number",
+		a.price AS "price",
+		a.size AS "size",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		count(c.id) as "orderNo"
+	</sql>
+	<sql id="undersBoothJoins">
+		LEFT JOIN a_interaction_recommend_unders b ON b.id = a.unders_id
+		left join a_interaction_recommend_unders_sign c on a.id=c.unders_booth_Id
+	</sql>
+    
+	<select id="get" resultType="UndersBooth">
+		SELECT 
+			<include refid="undersBoothColumns"/>
+		FROM a_interaction_recommend_unders_booth a
+		<include refid="undersBoothJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="findList" resultType="UndersBooth">
+		SELECT 
+			<include refid="undersBoothColumns"/>
+		FROM a_interaction_recommend_unders_booth a
+		<include refid="undersBoothJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="undersId != null and undersId.id != null and undersId.id != ''">
+				AND a.unders_id = #{undersId.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="number != null and number != ''">
+				AND a.number = #{number}
+			</if>
+		</where>
+		group by a.id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UndersBooth">
+		SELECT 
+			<include refid="undersBoothColumns"/>
+		FROM a_interaction_recommend_unders_booth a
+		<include refid="undersBoothJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_recommend_unders_booth(
+			id,
+			unders_id,
+			img,
+			name,
+			number,
+			price,
+			size,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{undersId.id},
+			#{img},
+			#{name},
+			#{number},
+			#{price},
+			#{size},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_recommend_unders_booth SET 	
+			unders_id = #{undersId.id},
+			img = #{img},
+			name = #{name},
+			number = #{number},
+			price = #{price},
+			size = #{size},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_recommend_unders_booth SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE unders_id = #{undersId.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

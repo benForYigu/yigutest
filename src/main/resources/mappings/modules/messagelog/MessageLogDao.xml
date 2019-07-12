@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.messagelog.dao.MessageLogDao">
+    
+	<sql id="messageLogColumns">
+		a.id AS "id",
+		a.student_id AS "studentId",
+		a.offer_id AS "offerId",
+		e.avatar AS "student.avatar",
+		e.realname AS "student.realname",
+		a.company_id AS "companyId",
+		a.type AS "type",
+		a.company_profession_id AS "companyProfessionId",
+		a.teachin_id AS "teachinId",
+		a.interview_id AS "interviewId",
+		a.interview_type AS "interviewType",
+		a.interview_time AS "interviewTime",
+		a.change_time AS "changeTime",
+		a.department AS "department",
+		a.is_read AS "isRead",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.avatar AS "companyhr.avatar",
+		b.realname AS "companyhr.realname",
+
+		c.name AS "company.name",
+
+		c.logo AS "company.logo",
+		d.name AS "profession.name"
+
+
+
+
+	</sql>
+	
+	<sql id="messageLogJoins">
+		left join a_account_companyhr b on a.company_id=b.company_id and b.del_flag='0'
+		left join a_company c on a.company_id=c.id and c.del_flag='0'
+		left join  a_company_profession d on a.company_profession_id=d.id and d.del_flag='0'
+		 LEFT JOIN a_account_studentinfo e ON a.student_id = e.account_id
+	</sql>
+    
+	<select id="get" resultType="MessageLog">
+		SELECT 
+			<include refid="messageLogColumns"/>
+		FROM a_message_log a
+		<include refid="messageLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MessageLog">
+		SELECT 
+			<include refid="messageLogColumns"/>
+		FROM a_message_log a
+		<include refid="messageLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="studentId != null and studentId != ''">
+				AND a.student_id = #{studentId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="teachinId != null and teachinId != ''">
+				AND a.teachin_id = #{teachinId}
+			</if>
+			<if test="companyProfessionId != null and companyProfessionId != ''">
+				AND a.company_profession_id = #{companyProfessionId}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="interviewId != null and interviewId != ''">
+				AND a.interview_id = #{interviewId}
+			</if>
+			<if test="interviewType != null and interviewType != ''">
+				AND a.interview_type = #{interviewType}
+			</if>
+			<if test="isRead != null and isRead != ''">
+				AND a.is_read = #{isRead}
+			</if>
+		</where>
+			<if test="groupFlag != null and groupFlag != ''">
+				GROUP BY a.student_id,a.company_profession_id
+			</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.type DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="findAllList" resultType="MessageLog">
+		SELECT 
+			<include refid="messageLogColumns"/>
+		FROM a_message_log a
+		<include refid="messageLogJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_message_log(
+			id,
+			student_id,
+			company_id,
+			offer_id,
+			type,
+			company_profession_id,
+			teachin_id,
+			interview_id,
+			interview_type,
+			interview_time,
+			change_time,
+			department,
+			is_read,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{studentId},
+			#{companyId},
+			#{offerId},
+			#{type},
+			#{companyProfessionId},
+			#{teachinId},
+			#{interviewId},
+			#{interviewType},
+			#{interviewTime},
+			#{changeTime},
+			#{department},
+			#{isRead},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+
+	<update id="update">
+		UPDATE a_message_log SET 	
+			student_id = #{studentId},
+			company_id = #{companyId},
+			offer_id = #{offerId},
+			type = #{type},
+			company_profession_id = #{companyProfessionId},
+			teachin_id = #{teachinId},
+			interview_id = #{interviewId},
+			interview_type = #{interviewType},
+			interview_time = #{interviewTime},
+			change_time = #{changeTime},
+			department = #{department},
+			is_read = #{isRead},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_message_log SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

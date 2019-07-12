@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.vip.dao.VipDao">
+    
+	<sql id="vipColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.price AS "price",
+		a.off_campus_information AS "offCampusInformation",
+		a.profession AS "profession",
+		a.under_teachin_read AS "underTeachinRead",
+		a.under_teachin_sign AS "underTeachinSign",
+		a.double_read AS "doubleRead",
+		a.double_sign AS "doubleSign",
+		a.teachin AS "teachin",
+		a.interview_time AS "interviewTime",
+		a.video AS "video",
+		a.exchange_meeting AS "exchangeMeeting",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="vipJoins">
+
+	</sql>
+    
+	<select id="get" resultType="Vip">
+		SELECT 
+			<include refid="vipColumns"/>
+		FROM a_vip a
+		<include refid="vipJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Vip">
+		SELECT 
+			<include refid="vipColumns"/>
+		FROM a_vip a
+		<include refid="vipJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.price
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Vip">
+		SELECT 
+			<include refid="vipColumns"/>
+		FROM a_vip a
+		<include refid="vipJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_vip(
+			id,
+			name,
+			price,
+			off_campus_information,
+			profession,
+			under_teachin_read,
+			under_teachin_sign,
+			double_read,
+			double_sign,
+			teachin,
+			interview_time,
+			video,
+			exchange_meeting,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{price},
+			#{offCampusInformation},
+			#{profession},
+			#{underTeachinRead},
+			#{underTeachinSign},
+			#{doubleRead},
+			#{doubleSign},
+			#{teachin},
+			#{interviewTime},
+			#{video},
+			#{exchangeMeeting},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_vip SET 	
+			name = #{name},
+			price = #{price},
+			off_campus_information = #{offCampusInformation},
+			profession = #{profession},
+			under_teachin_read = #{underTeachinRead},
+			under_teachin_sign = #{underTeachinSign},
+			double_read = #{doubleRead},
+			double_sign = #{doubleSign},
+			teachin = #{teachin},
+			interview_time = #{interviewTime},
+			video = #{video},
+			exchange_meeting = #{exchangeMeeting},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_vip SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

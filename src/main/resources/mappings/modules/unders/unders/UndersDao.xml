@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.unders.dao.unders.UndersDao">
+    
+	<sql id="undersColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.school_id AS "schoolId",
+		a.img AS "img",
+		a.title AS "title",
+		a.sub_title AS "subTitle",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.sign_start AS "signStart",
+		a.sign_end AS "signEnd",
+		a.address AS "address",
+		a.number AS "number",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		b.name AS "schoolName",
+		not a.end_date>now() as expire/*0未过期  1已过期*/
+
+	</sql>
+	
+	<sql id="undersJoins">
+		inner join a_school b on a.school_id=b.id
+
+
+	</sql>
+    
+	<select id="get" resultType="Unders">
+		SELECT 
+			<include refid="undersColumns"/>
+		FROM a_interaction_recommend_unders a
+		<include refid="undersJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Unders">
+		SELECT 
+			<include refid="undersColumns"/>
+		FROM a_interaction_recommend_unders a
+		<include refid="undersJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="schoolId != null and schoolId != ''">
+				AND a.school_id = #{schoolId}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+		</where>
+		GROUP BY a.id
+		<choose>
+
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findListByCompany" resultType="Unders">
+		SELECT
+			<include refid="undersColumns"/>
+		,case when
+		(select id from a_interaction_recommend_unders_sign where unders_id=a.id
+		and company_id=#{companyId}
+		/*and status='3'*/
+		)
+		 is null then 0
+		else  1
+		end as isSign
+		FROM a_interaction_recommend_unders a
+		<include refid="undersJoins"/>
+		left join a_interaction_recommend_unders_sign c on a.id=c.unders_id
+
+		<where>
+			a.del_flag ='0'
+
+
+			<if test="title != null and title != ''">
+				AND a.title LIKE concat('%',#{title},'%')
+			</if>
+		</where>
+
+				GROUP by a.id
+				ORDER BY expire ,a.create_date DESC
+
+
+	</select>
+
+	<select id="findAllList" resultType="Unders">
+		SELECT 
+			<include refid="undersColumns"/>
+		FROM a_interaction_recommend_unders a
+		<include refid="undersJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_recommend_unders(
+			id,
+			type,
+			school_id,
+			img,
+			title,
+			sub_title,
+			start_date,
+			end_date,
+			sign_start,
+			sign_end,
+			address,
+			number,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{type},
+			#{schoolId},
+			#{img},
+			#{title},
+			#{subTitle},
+			#{startDate},
+			#{endDate},
+			#{signStart},
+			#{signEnd},
+			#{address},
+			#{number},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_recommend_unders SET 	
+			type = #{type},
+			school_id = #{schoolId},
+			img = #{img},
+			title = #{title},
+			sub_title = #{subTitle},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			sign_start = #{signStart},
+			sign_end = #{signEnd},
+			address = #{address},
+			number = #{number},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_recommend_unders SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.dao.offer.InteractionOfferDao">
+    
+	<sql id="interactionOfferColumns">
+		a.id AS "id",
+		a.interview_id AS "interviewId",
+
+		a.student_id AS "studentId",
+		s.realname AS "student.realname",
+		a.company_id AS "companyId",
+		c.name AS "company.name",
+		a.department AS "department",
+		a.position AS "position",
+		a.entry_time AS "entryTime",
+		a.province AS "province",
+		a.city AS "city",
+		a.work_address AS "workAddress",
+		a.sign_address AS "signAddress",
+		a.salary AS "salary",
+		a.notice AS "notice",
+		a.status AS "status",
+		a.agreement AS "agreement",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionOfferJoins">
+		left join a_account_studentinfo s on a.student_id=s.account_id
+
+		left join a_company c on a.company_id=c.id
+	</sql>
+    
+	<select id="get" resultType="InteractionOffer">
+		SELECT 
+			<include refid="interactionOfferColumns"/>
+		FROM a_interaction_offer a
+		<include refid="interactionOfferJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionOffer">
+		SELECT 
+			<include refid="interactionOfferColumns"/>
+		FROM a_interaction_offer a
+		<include refid="interactionOfferJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="interviewId != null and interviewId != ''">
+				AND a.interview_id = #{interviewId}
+			</if>
+			<if test="studentId != null and studentId != ''">
+				AND a.student_id = #{studentId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InteractionOffer">
+		SELECT 
+			<include refid="interactionOfferColumns"/>
+		FROM a_interaction_offer a
+		<include refid="interactionOfferJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_offer(
+			id,
+			interview_id,
+
+			student_id,
+			company_id,
+			department,
+			position,
+			entry_time,
+			province,
+			city,
+			work_address,
+
+			sign_address,
+			salary,
+			notice,
+			status,
+			agreement,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{interviewId},
+
+			#{studentId},
+			#{companyId},
+			#{department},
+			#{position},
+			#{entryTime},
+			#{province},
+			#{city},
+			#{workAddress},
+			#{signAddress},
+			#{salary},
+			#{notice},
+			#{status},
+			#{agreement},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_offer SET 	
+			interview_id = #{interviewId},
+
+			student_id = #{studentId},
+			company_id = #{companyId},
+			department = #{department},
+			position = #{position},
+			entry_time = #{entryTime},
+			province = #{province},
+			city = #{city},
+			work_address = #{workAddress},
+			sign_address = #{signAddress},
+			salary = #{salary},
+			notice = #{notice},
+			status = #{status},
+			agreement = #{agreement},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_offer SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.testuser.dao.TestUserinfoDao">
+    
+	<sql id="testUserinfoColumns">
+		a.id AS "id",
+		a.user_name AS "userName",
+		a.user_dste AS "userDste",
+		a.user_dete AS "userDete"
+	</sql>
+	
+	<sql id="testUserinfoJoins">
+	</sql>
+    
+	<select id="get" resultType="TestUserinfo">
+		SELECT 
+			<include refid="testUserinfoColumns"/>
+		FROM test_userinfo a
+		<include refid="testUserinfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TestUserinfo">
+		SELECT 
+			<include refid="testUserinfoColumns"/>
+		FROM test_userinfo a
+		<include refid="testUserinfoJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TestUserinfo">
+		SELECT 
+			<include refid="testUserinfoColumns"/>
+		FROM test_userinfo a
+		<include refid="testUserinfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO test_userinfo(
+			id,
+			user_name,
+			user_dste,
+			user_dete
+		) VALUES (
+			#{id},
+			#{userName},
+			#{userDste},
+			#{userDete}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE test_userinfo SET 	
+			user_name = #{userName},
+			user_dste = #{userDste},
+			user_dete = #{userDete}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM test_userinfo
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

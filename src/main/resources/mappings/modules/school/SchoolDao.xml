@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.school.dao.SchoolDao">
+    
+	<sql id="schoolColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.hot AS "hot",
+		a.img_id AS "imgId",
+		a.type AS "type",
+		a.jurisdiction AS "jurisdiction",
+		a.code AS "code",
+		a.introduce AS "introduce",
+		a.f_d11 AS "fD11",
+		a.sl_d11 AS "slD11",
+		a.f_211 AS "f211",
+		a.f_985pt AS "f985pt",
+		a.f_985 AS "f985",
+		a.natrue AS "natrue",
+		a.profession AS "profession",
+		a.matriculate AS "matriculate",
+		a.area AS "area",
+		a.city AS "city",
+		a.logo AS "logo",
+		a.sort AS "sort",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="schoolColumn">
+		a.id AS "id",
+		a.name AS "name",
+		a.hot AS "hot",
+		a.img_id AS "imgId",
+		a.type AS "type",
+		a.jurisdiction AS "jurisdiction",
+		a.code AS "code",
+
+		a.f_d11 AS "fD11",
+		a.sl_d11 AS "slD11",
+		a.f_211 AS "f211",
+		a.f_985pt AS "f985pt",
+		a.f_985 AS "f985",
+		a.natrue AS "natrue",
+		a.profession AS "profession",
+		a.matriculate AS "matriculate",
+		a.area AS "area",
+		a.city AS "city",
+		a.logo AS "logo",
+		a.sort AS "sort"
+
+	</sql>
+
+	<sql id="schoolJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.city
+
+	</sql>
+    
+	<select id="get" resultType="School">
+		SELECT 
+			<include refid="schoolColumns"/>
+		FROM a_school a
+		<include refid="schoolJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="School">
+		SELECT 
+			<include refid="schoolColumn"/>
+		FROM a_school a
+		<if test="city != null and city != ''">
+			inner join sys_area s on (s.id=#{city} or FIND_IN_SET(#{city},s.parent_ids)) and a.city=s.id
+		</if>
+		<include refid="schoolJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="jurisdiction != null and jurisdiction != ''">
+				AND a.jurisdiction = #{jurisdiction}
+			</if>
+			<if test="natrue != null and natrue != ''">
+				AND a.natrue = #{natrue}
+			</if>
+			<if test="hot != null and hot != ''">
+				AND a.hot = #{hot}
+			</if>
+			<if test="profession != null and profession != ''">
+				AND a.profession = #{profession}
+			</if>
+			<if test="f985 != null and f985 != ''">
+				AND a.f_985 = #{f985}
+			</if>
+			<if test="f211 != null and f211 != ''">
+				AND a.f_211 = #{f211}
+			</if>
+
+			<if test="city != null and city != ''">
+				AND (a.city=#{city}  or FIND_IN_SET(#{city},a5.parent_ids))
+			</if>
+
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="School">
+		SELECT 
+			<include refid="schoolColumns"/>
+		FROM a_school a
+		<include refid="schoolJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_school(
+			id,
+			hot,
+			name,
+			img_id,
+			type,
+			jurisdiction,
+			code,
+			introduce,
+			f_d11,
+			sl_d11,
+			f_211,
+			f_985pt,
+			f_985,
+			natrue,
+			profession,
+			matriculate,
+			area,
+			city,
+			logo,
+			sort,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{hot},
+			#{name},
+			#{imgId},
+			#{type},
+			#{jurisdiction},
+			#{code},
+			#{introduce},
+			#{fD11},
+			#{slD11},
+			#{f211},
+			#{f985pt},
+			#{f985},
+			#{natrue},
+			#{profession},
+			#{matriculate},
+			#{area},
+			#{city},
+			#{logo},
+			#{sort},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_school SET 	
+			name = #{name},
+			hot = #{hot},
+			img_id = #{imgId},
+			type = #{type},
+			jurisdiction = #{jurisdiction},
+			code = #{code},
+			introduce = #{introduce},
+			f_d11 = #{fD11},
+			sl_d11 = #{slD11},
+			f_211 = #{f211},
+			f_985pt = #{f985pt},
+			f_985 = #{f985},
+			natrue = #{natrue},
+			profession = #{profession},
+			matriculate = #{matriculate},
+			area = #{area},
+			city = #{city},
+			logo = #{logo},
+			sort = #{sort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_school SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

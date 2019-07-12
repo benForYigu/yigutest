@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.interview.dao.comment.InteractionInterviewCommentDao">
+    
+	<sql id="interactionInterviewCommentColumns">
+		a.id AS "id",
+		a.interview_id AS "interviewId",
+		a.charm AS "charm",
+		a.affinity AS "affinity",
+		a.quality AS "quality",
+		a.positive AS "positive",
+		a.culture AS "culture",
+		a.consciousness AS "consciousness",
+		a.interest AS "interest",
+		a.trust AS "trust",
+		a.integrate AS "integrate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionInterviewCommentJoins">
+	</sql>
+    
+	<select id="get" resultType="InteractionInterviewComment">
+		SELECT 
+			<include refid="interactionInterviewCommentColumns"/>
+		FROM a_interaction_interview_comment a
+		<include refid="interactionInterviewCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionInterviewComment">
+		SELECT 
+			<include refid="interactionInterviewCommentColumns"/>
+		FROM a_interaction_interview_comment a
+		<include refid="interactionInterviewCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="interviewId != null and interviewId != ''">
+				AND a.interview_id = #{interviewId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InteractionInterviewComment">
+		SELECT 
+			<include refid="interactionInterviewCommentColumns"/>
+		FROM a_interaction_interview_comment a
+		<include refid="interactionInterviewCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_interview_comment(
+			id,
+			interview_id,
+			charm,
+			affinity,
+			quality,
+			positive,
+			culture,
+			consciousness,
+			interest,
+			trust,
+			integrate,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{interviewId},
+			#{charm},
+			#{affinity},
+			#{quality},
+			#{positive},
+			#{culture},
+			#{consciousness},
+			#{interest},
+			#{trust},
+			#{integrate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_interview_comment SET 	
+			interview_id = #{interviewId},
+			charm = #{charm},
+			affinity = #{affinity},
+			quality = #{quality},
+			positive = #{positive},
+			culture = #{culture},
+			consciousness = #{consciousness},
+			interest = #{interest},
+			trust = #{trust},
+			integrate = #{integrate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_interview_comment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

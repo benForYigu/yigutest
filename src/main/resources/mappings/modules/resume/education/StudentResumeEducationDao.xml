@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.resume.dao.education.StudentResumeEducationDao">
+    
+	<sql id="studentResumeEducationColumns">
+		a.id AS "id",
+		a.student_id AS "studentId",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.school_name AS "schoolName",
+		a.education_background AS "educationBackground",
+		a.major AS "major",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="studentResumeEducationJoins">
+	</sql>
+    
+	<select id="get" resultType="StudentResumeEducation">
+		SELECT 
+			<include refid="studentResumeEducationColumns"/>
+		FROM a_student_resume_education a
+		<include refid="studentResumeEducationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="StudentResumeEducation">
+		SELECT 
+			<include refid="studentResumeEducationColumns"/>
+		FROM a_student_resume_education a
+		<include refid="studentResumeEducationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="studentId != null and studentId != ''">
+				AND a.student_id = #{studentId}
+			</if>
+			<if test="educationBackground != null and educationBackground != ''">
+				AND a.education_background = #{educationBackground}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.end_date DESC,a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="StudentResumeEducation">
+		SELECT 
+			<include refid="studentResumeEducationColumns"/>
+		FROM a_student_resume_education a
+		<include refid="studentResumeEducationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_student_resume_education(
+			id,
+			student_id,
+			start_date,
+			end_date,
+			school_name,
+			education_background,
+			major,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{studentId},
+			#{startDate},
+			#{endDate},
+			#{schoolName},
+			#{educationBackground},
+			#{major},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_student_resume_education SET 	
+			student_id = #{studentId},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			education_background = #{educationBackground},
+			school_name = #{schoolName},
+			major = #{major},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_student_resume_education SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.accountrecommend.dao.AccountRecommendDao">
+    
+	<sql id="accountRecommendColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.be_account_id AS "beAccountId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		i.role as "inviteAccount.role",
+		i.username as "inviteAccount.username",
+		b.role as "beInviteAccount.role",
+		b.username as "beInviteAccount.username"
+		/*case i.role
+		when '1' then select username from a_account_companyhr where account_id=i.id
+		when '3' then select username from a_account_studentinfo where account_id=i.id
+		end as iavatar*/
+	</sql>
+	
+	<sql id="accountRecommendJoins">
+		inner join a_account i on a.account_id=i.id
+		inner join a_account b on a.be_account_id=b.id
+
+	</sql>
+    
+	<select id="get" resultType="AccountRecommend">
+		SELECT 
+			<include refid="accountRecommendColumns"/>
+		FROM a_account_recommend a
+		<include refid="accountRecommendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="AccountRecommend">
+		SELECT 
+			<include refid="accountRecommendColumns"/>
+		FROM a_account_recommend a
+		<include refid="accountRecommendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="beAccountId != null and beAccountId != ''">
+				AND a.be_account_id = #{beAccountId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AccountRecommend">
+		SELECT 
+			<include refid="accountRecommendColumns"/>
+		FROM a_account_recommend a
+		<include refid="accountRecommendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_account_recommend(
+			id,
+			account_id,
+			be_account_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{beAccountId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_account_recommend SET 	
+			account_id = #{accountId},
+			be_account_id = #{beAccountId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_account_recommend SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

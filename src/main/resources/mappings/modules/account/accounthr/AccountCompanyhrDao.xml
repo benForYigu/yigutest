@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.account.dao.accounthr.AccountCompanyhrDao">
+    
+	<sql id="accountCompanyhrColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.company_id AS "companyId",
+
+		c.name AS "companyName",
+
+		a.avatar AS "avatar",
+		a.realname AS "realname",
+		a.phone AS "phone",
+		a.major AS "major",
+		a.sex AS "sex",
+		a.email AS "email",
+		a.status AS "status",
+		a.card AS "card",
+		a.remark AS "remark",
+		a.coin AS "coin",
+		a.vip AS "vip",
+		a.vip_name AS "vipName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="accountCompanyhrJoins">
+				left join a_company c on a.company_id=c.id and c.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="AccountCompanyhr">
+		SELECT 
+			<include refid="accountCompanyhrColumns"/>
+		FROM a_account_companyhr a
+		<include refid="accountCompanyhrJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByAccountId" resultType="AccountCompanyhr">
+		SELECT
+			<include refid="accountCompanyhrColumns"/>
+		FROM a_account_companyhr a
+		<include refid="accountCompanyhrJoins"/>
+		WHERE a.account_id = #{accountId}
+	</select>
+	<select id="getByCompanyId" resultType="AccountCompanyhr">
+		SELECT
+			<include refid="accountCompanyhrColumns"/>
+		FROM a_account_companyhr a
+		<include refid="accountCompanyhrJoins"/>
+		WHERE a.company_id = #{companyId}
+	</select>
+
+	<select id="findList" resultType="AccountCompanyhr">
+		SELECT 
+			<include refid="accountCompanyhrColumns"/>
+		FROM a_account_companyhr a
+		<include refid="accountCompanyhrJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE concat('%',#{phone},'%')
+			</if>
+			<if test="vip != null and vip != ''">
+				AND a.vip = #{vip}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AccountCompanyhr">
+		SELECT 
+			<include refid="accountCompanyhrColumns"/>
+		FROM a_account_companyhr a
+		<include refid="accountCompanyhrJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_account_companyhr(
+			id,
+			account_id,
+			company_id,
+			avatar,
+			realname,
+			phone,
+			major,
+			sex,
+			email,
+			status,
+			card,
+			remark,
+			coin,
+			vip,
+			vip_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{companyId},
+			#{avatar},
+			#{realname},
+			#{phone},
+			#{major},
+			#{sex},
+			#{email},
+			#{status},
+			#{card},
+			#{remark},
+			#{coin},
+			#{vip},
+			#{vipName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_account_companyhr SET 	
+			account_id = #{accountId},
+			company_id = #{companyId},
+			avatar = #{avatar},
+			realname = #{realname},
+			phone = #{phone},
+			major = #{major},
+			sex = #{sex},
+			email = #{email},
+			status = #{status},
+			card = #{card},
+			remark = #{remark},
+			vip = #{vip},
+			vip_name = #{vipName},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_account_companyhr SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

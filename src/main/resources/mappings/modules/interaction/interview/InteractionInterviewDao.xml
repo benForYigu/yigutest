@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.dao.interview.InteractionInterviewDao">
+    
+	<sql id="interactionInterviewColumns">
+		a.id AS "id",
+		a.student_id AS "studentId",
+
+		s.realname AS "student.realname",
+
+		a.company_id AS "companyId",
+		c.name AS "companyName",
+		a.company_profession_id AS "companyProfessionId",
+
+		p.name AS "professionName",
+
+		a.teachin_id AS "teachinId",
+		a.interview_type AS "interviewType",
+		a.interview_time AS "interviewTime",
+		a.interview_status AS "interviewStatus",
+		a.interview_step AS "interviewStep",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionInterviewJoins">
+		inner join a_account_studentinfo s on a.student_id=s.account_id
+		inner join a_company_profession p on a.company_profession_id=p.id
+		inner join a_company c on a.company_id=c.id
+	</sql>
+    
+	<select id="get" resultType="InteractionInterview">
+		SELECT 
+			<include refid="interactionInterviewColumns"/>
+		FROM a_interaction_interview a
+		<include refid="interactionInterviewJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionInterview">
+		SELECT 
+			<include refid="interactionInterviewColumns"/>
+		FROM a_interaction_interview a
+		<include refid="interactionInterviewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="companyProfessionId != null and companyProfessionId != ''">
+				AND a.company_profession_id = #{companyProfessionId}
+			</if>
+			<if test="teachinId != null and teachinId != ''">
+				AND a.teachin_id = #{teachinId}
+			</if>
+			<if test="studentId != null and studentId != ''">
+				AND a.student_id = #{studentId}
+			</if>
+			<if test="interviewType != null and interviewType != ''">
+				AND a.interview_type = #{interviewType}
+			</if>
+			<if test="interviewStatus != null and interviewStatus != ''">
+				AND a.interview_status = #{interviewStatus}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InteractionInterview">
+		SELECT 
+			<include refid="interactionInterviewColumns"/>
+		FROM a_interaction_interview a
+		<include refid="interactionInterviewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_interview(
+			id,
+			student_id,
+			company_id,
+			company_profession_id,
+			teachin_id,
+			interview_type,
+			interview_time,
+			interview_status,
+			interview_step,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{studentId},
+			#{companyId},
+			#{companyProfessionId},
+			#{teachinId},
+			#{interviewType},
+			#{interviewTime},
+			#{interviewStatus},
+			#{interviewStep},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_interview SET 	
+			student_id = #{studentId},
+			company_id = #{companyId},
+			company_profession_id = #{companyProfessionId},
+			teachin_id = #{teachinId},
+			interview_type = #{interviewType},
+			interview_time = #{interviewTime},
+			interview_status = #{interviewStatus},
+			interview_step = #{interviewStep},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_interview SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.company.dao.CompanyDao">
+    
+	<sql id="companyColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.short_name AS "shortName",
+		a.contact AS "contact",
+		a.contact_phone AS "contactPhone",
+		a.email AS "email",
+
+		a.logo AS "logo",
+		a.industry AS "industry",
+
+		i.name AS "industryName",
+
+		a.web_site AS "webSite",
+		a.video AS "video",
+		a.img AS "img",
+		a.scale AS "scale",
+		a.nature AS "nature",
+		a.business_licence AS "businessLicence",
+		a.intruduce AS "intruduce",
+		a.status AS "status",
+		a.address AS "address",
+
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		c.realname AS "companyhr.realname"
+
+
+	</sql>
+	
+	<sql id="companyJoins">
+		inner join a_account_companyhr c on a.id=c.company_id
+		left join a_dict_industry i on a.industry=i.id and i.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="Company">
+		SELECT 
+			<include refid="companyColumns"/>
+		FROM a_company a
+		<include refid="companyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Company">
+		SELECT 
+			<include refid="companyColumns"/>
+		FROM a_company a
+		<include refid="companyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Company">
+		SELECT 
+			<include refid="companyColumns"/>
+		FROM a_company a
+		<include refid="companyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_company(
+			id,
+			name,
+			short_name,
+			contact,
+			contact_phone,
+			email,
+
+			logo,
+			industry,
+			web_site,
+			video,
+			img,
+			scale,
+			nature,
+			business_licence,
+			intruduce,
+			status,
+			address,
+
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{shortName},
+			#{contact},
+			#{contactPhone},
+			#{email},
+
+			#{logo},
+			#{industry},
+			#{webSite},
+			#{video},
+			#{img},
+			#{scale},
+			#{nature},
+			#{businessLicence},
+			#{intruduce},
+			#{status},
+			#{address},
+
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_company SET 	
+			name = #{name},
+			short_name = #{shortName},
+			contact = #{contact},
+			contact_phone = #{contactPhone},
+			email = #{email},
+
+			logo = #{logo},
+			industry = #{industry},
+			web_site = #{webSite},
+			video = #{video},
+			img = #{img},
+			scale = #{scale},
+			nature = #{nature},
+			business_licence = #{businessLicence},
+			intruduce = #{intruduce},
+			status = #{status},
+			address = #{address},
+
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_company SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

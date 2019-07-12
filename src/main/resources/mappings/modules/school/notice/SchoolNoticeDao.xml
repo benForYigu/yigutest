@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.school.dao.notice.SchoolNoticeDao">
+    
+	<sql id="schoolNoticeColumns">
+		a.id AS "id",
+		a.school_id AS "schoolId",
+		s.name AS "schoolName",
+		a.img AS "img",
+		a.title AS "title",
+		a.sub_title AS "subTitle",
+		a.status AS "status",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	<sql id="schoolNoticeColumn">
+		a.id AS "id",
+		a.school_id AS "schoolId",
+		s.name AS "schoolName",
+		a.img AS "img",
+		a.title AS "title",
+		a.sub_title AS "subTitle",
+		a.status AS "status",
+
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<sql id="schoolNoticeJoins">
+		left join a_school s on a.school_id=s.id and s.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="SchoolNotice">
+		SELECT 
+			<include refid="schoolNoticeColumns"/>
+		FROM a_school_notice a
+		<include refid="schoolNoticeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SchoolNotice">
+		SELECT 
+			<include refid="schoolNoticeColumn"/>
+		FROM a_school_notice a
+		<include refid="schoolNoticeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="schoolId != null and schoolId != ''">
+				AND a.school_id = #{schoolId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SchoolNotice">
+		SELECT 
+			<include refid="schoolNoticeColumns"/>
+		FROM a_school_notice a
+		<include refid="schoolNoticeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_school_notice(
+			id,
+			school_id,
+			img,
+			title,
+			sub_title,
+			status,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{schoolId},
+			#{img},
+			#{title},
+			#{subTitle},
+			#{status},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_school_notice SET 	
+			school_id = #{schoolId},
+			img = #{img},
+			title = #{title},
+			sub_title = #{subTitle},
+			status = #{status},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_school_notice SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

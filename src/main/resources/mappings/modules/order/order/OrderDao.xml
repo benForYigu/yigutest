@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.order.dao.order.OrderDao">
+    
+	<sql id="orderColumns">
+		a.id AS "id",
+		a.teachin_id AS "teachinId",
+		a.company_id AS "companyId",
+		a.account_id AS "accountId",
+		a.payment AS "payment",
+		a.pay_time AS "payTime",
+		a.end_time AS "endTime",
+		a.transaction_id AS "transactionId",
+		a.pay_type AS "payType",
+		a.status AS "status",
+		a.voucher AS "voucher",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		h.company_id AS "companyhr.companyId",
+		h.avatar AS "companyhr.avatar",
+		h.realname AS "companyhr.realname",
+		c.name AS "companyhr.companyName",
+
+		t.id AS "teachin.id",
+		t.shelf AS "teachin.shelf",
+		t.company_id AS "teachin.companyId",
+		t.account_id AS "teachin.accountId",
+		t.school_id AS "teachin.schoolId",
+		s.name AS "teachin.schoolName",
+		s.logo AS "teachin.schoolLogo",
+		t.profession AS "teachin.profession",
+		t.img AS "teachin.img",
+		t.title AS "teachin.title",
+		t.date AS "teachin.date",
+		t.time AS "teachin.time",
+		t.content AS "teachin.content",
+		t.status AS "teachin.status",
+		v.id as "invoicesId",
+		v.id as "orderInvoices.id",
+		v.status as "orderInvoices.status",
+		v.account_id AS "orderInvoices.accountId",
+		v.company_id AS "orderInvoices.companyId",
+		v.order_id AS "orderInvoices.orderId",
+		v.name AS "orderInvoices.name",
+		v.phone AS "orderInvoices.phone",
+		v.address AS "orderInvoices.address",
+		v.taxcode AS "orderInvoices.taxcode",
+		v.company_name AS "orderInvoices.companyName",
+		v.company_address AS "orderInvoices.companyAddress",
+		v.company_phone AS "orderInvoices.companyPhone",
+		v.bank AS "orderInvoices.bank",
+		v.bank_card AS "orderInvoices.bankCard",
+		v.img AS "orderInvoices.img"
+	</sql>
+	
+	<sql id="orderJoins">
+			inner join a_account_companyhr h on a.account_id=h.account_id
+			inner join a_company c on a.company_id=c.id
+			left join a_interaction_teachin t on a.teachin_id=t.id
+			left join a_school s on t.school_id =s.id
+			left join a_order_invoices v on a.id=v.order_id and v.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="Order">
+		SELECT 
+			<include refid="orderColumns"/>
+		FROM a_order a
+		<include refid="orderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getLock" resultType="Order">
+		SELECT
+			<include refid="orderColumns"/>
+		FROM a_order a
+		<include refid="orderJoins"/>
+		WHERE a.id = #{id} FOR UPDATE
+	</select>
+
+	<select id="findList" resultType="Order">
+		SELECT 
+			<include refid="orderColumns"/>
+		FROM a_order a
+		<include refid="orderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and (t.id is not null  OR a.pay_type='4')
+			<if test="status == null or status == ''.toString()">
+				AND (a.status != '1' OR a.pay_type='4')
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="teachinId != null and teachinId != ''">
+				AND a.teachin_id = #{teachinId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="payType != null and payType != ''">
+				AND a.pay_type = #{payType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Order">
+		SELECT 
+			<include refid="orderColumns"/>
+		FROM a_order a
+		<include refid="orderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_order(
+			id,
+			teachin_id,
+			company_id,
+			account_id,
+			payment,
+			pay_time,
+			end_time,
+			transaction_id,
+			pay_type,
+			status,
+			voucher,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{teachinId},
+			#{companyId},
+			#{accountId},
+			#{payment},
+			#{payTime},
+			#{endTime},
+			#{transactionId},
+			#{payType},
+			#{status},
+			#{voucher},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_order SET 	
+			teachin_id = #{teachinId},
+			company_id = #{companyId},
+			account_id = #{accountId},
+			payment = #{payment},
+			pay_time = #{payTime},
+			end_time = #{endTime},
+			transaction_id = #{transactionId},
+			pay_type = #{payType},
+			status = #{status},
+			voucher = #{voucher},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

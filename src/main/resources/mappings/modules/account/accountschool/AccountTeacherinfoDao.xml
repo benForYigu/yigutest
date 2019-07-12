@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.account.dao.accountschool.AccountTeacherinfoDao">
+    
+	<sql id="accountTeacherinfoColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.school_id AS "schoolId",
+
+		s.name AS "schoolName",
+
+		a.avatar AS "avatar",
+		a.realname AS "realname",
+		a.phone AS "phone",
+		a.sex AS "sex",
+		a.id_card AS "idCard",
+		a.id_card_status AS "idCardStatus",
+		a.email AS "email",
+		a.remark AS "remark",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="accountTeacherinfoJoins">
+		left join a_school s on a.school_id=s.id and s.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="AccountTeacherinfo">
+		SELECT 
+			<include refid="accountTeacherinfoColumns"/>
+		FROM a_account_teacherinfo a
+		<include refid="accountTeacherinfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByAccountId" resultType="AccountTeacherinfo">
+		SELECT
+			<include refid="accountTeacherinfoColumns"/>
+		FROM a_account_teacherinfo a
+		<include refid="accountTeacherinfoJoins"/>
+		WHERE a.account_id = #{accountId}
+	</select>
+
+	<select id="findList" resultType="AccountTeacherinfo">
+		SELECT 
+			<include refid="accountTeacherinfoColumns"/>
+		FROM a_account_teacherinfo a
+		<include refid="accountTeacherinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="schoolId != null and schoolId != ''">
+				AND a.school_id = #{schoolId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{phone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{phone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{phone},'%')</if>
+			</if>
+			<if test="idCardStatus != null and idCardStatus != ''">
+				AND a.id_card_status = #{idCardStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AccountTeacherinfo">
+		SELECT 
+			<include refid="accountTeacherinfoColumns"/>
+		FROM a_account_teacherinfo a
+		<include refid="accountTeacherinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_account_teacherinfo(
+			id,
+			account_id,
+			school_id,
+			avatar,
+			realname,
+			phone,
+			sex,
+			id_card,
+			id_card_status,
+			email,
+			remark,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{schoolId},
+			#{avatar},
+			#{realname},
+			#{phone},
+			#{sex},
+			#{idCard},
+			#{idCardStatus},
+			#{email},
+			#{remark},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_account_teacherinfo SET 	
+			account_id = #{accountId},
+			school_id = #{schoolId},
+			avatar = #{avatar},
+			realname = #{realname},
+			phone = #{phone},
+			sex = #{sex},
+			id_card = #{idCard},
+			id_card_status = #{idCardStatus},
+			email = #{email},
+			remark = #{remark},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_account_teacherinfo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

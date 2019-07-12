@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.company.dao.profession.CompanyProfessionDao">
+    
+	<sql id="companyProfessionColumns">
+		a.id AS "id",
+		a.source AS "source",
+		a.company_id AS "companyId",
+		a.company_name AS "companyName",
+		a.name AS "name",
+		a.type AS "type",
+		a.city AS "city",
+		a.area AS "area",
+
+		c.name AS "company.name",
+
+
+
+		a.experience AS "experience",
+		a.major AS "major",
+		a.educational_background AS "educationalBackground",
+		a.tag AS "tag",
+		a.nature AS "nature",
+		a.salary AS "salary",
+		a.number AS "number",
+		a.board AS "board",
+		a.traffic_subsidy AS "trafficSubsidy",
+		a.hot AS "hot",
+		a.sort AS "sort",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="companyProfessionJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.city
+		left join a_company c on a.company_id=c.id
+	</sql>
+    
+	<select id="get" resultType="CompanyProfession">
+		SELECT 
+			<include refid="companyProfessionColumns"/>
+		FROM a_company_profession a
+		<include refid="companyProfessionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CompanyProfession">
+		SELECT 
+			<include refid="companyProfessionColumns"/>
+		FROM a_company_profession a
+		<include refid="companyProfessionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="source != null and source != ''">
+				AND a.source = #{source}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="hot != null and hot != ''">
+				AND a.hot = #{hot}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="salary != null and salary != ''">
+				AND a.salary = #{salary}
+			</if>
+			<if test="educationalBackground != null and educationalBackground != ''">
+				AND a.educational_background = #{educationalBackground}
+			</if>
+			<if test="city != null and city != ''">
+				AND (a.city=#{city} or a.city=(select name from sys_area where id=#{city})  or FIND_IN_SET(#{city},a5.parent_ids))
+
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort ,a.update_date asc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CompanyProfession">
+		SELECT 
+			<include refid="companyProfessionColumns"/>
+		FROM a_company_profession a
+		<include refid="companyProfessionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_company_profession(
+			id,
+			source,
+			company_id,
+			company_name,
+			name,
+			type,
+			city,
+			area,
+			experience,
+			major,
+			educational_background,
+			tag,
+			nature,
+			salary,
+			number,
+			board,
+			traffic_subsidy,
+			hot,
+			sort,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{source},
+			#{companyId},
+			#{companyName},
+			#{name},
+			#{type},
+			#{city},
+			#{area},
+			#{experience},
+			#{major},
+			#{educationalBackground},
+			#{tag},
+			#{nature},
+			#{salary},
+			#{number},
+			#{board},
+			#{trafficSubsidy},
+			#{hot},
+			#{sort},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_company_profession SET 	
+			source = #{source},
+			company_id = #{companyId},
+			company_name = #{companyName},
+			name = #{name},
+			type = #{type},
+			city = #{city},
+			area = #{area},
+			experience = #{experience},
+			major = #{major},
+			educational_background = #{educationalBackground},
+			tag = #{tag},
+			nature = #{nature},
+			salary = #{salary},
+			number = #{number},
+			board = #{board},
+			traffic_subsidy = #{trafficSubsidy},
+			hot = #{hot},
+			sort = #{sort},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_company_profession SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

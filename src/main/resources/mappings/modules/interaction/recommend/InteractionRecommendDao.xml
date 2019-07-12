@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.dao.recommend.InteractionRecommendDao">
+    
+	<sql id="interactionRecommendColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.sub_title AS "subTitle",
+		a.apply_to AS "applyTo",
+		a.suport_company AS "suportCompany",
+		a.sort AS "sort",
+		a.img AS "img",
+		a.type AS "type",
+		a.link AS "link",
+		a.link_type AS "linkType",
+		a.status AS "status",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionRecommendJoins">
+	</sql>
+    
+	<select id="get" resultType="InteractionRecommend">
+		SELECT 
+			<include refid="interactionRecommendColumns"/>
+		FROM a_interaction_recommend a
+		<include refid="interactionRecommendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionRecommend">
+		SELECT 
+			<include refid="interactionRecommendColumns"/>
+		FROM a_interaction_recommend a
+		<include refid="interactionRecommendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="applyTo != null and applyTo != ''">
+				AND FIND_IN_SET(#{applyTo},a.apply_to)
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="suportCompany != null and suportCompany != ''">
+				AND a.suport_company = #{suportCompany}
+			</if>
+			<if test="link != null and link != ''">
+				AND a.link = #{link}
+			</if>
+			<if test="linkType != null and linkType != ''">
+				AND a.link_type = #{linkType}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.type,a.sort,a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InteractionRecommend">
+		SELECT 
+			<include refid="interactionRecommendColumns"/>
+		FROM a_interaction_recommend a
+		<include refid="interactionRecommendJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_recommend(
+			id,
+			title,
+			sub_title,
+			apply_to,
+			suport_company,
+			sort,
+			img,
+			type,
+			link,
+			link_type,
+			status,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{subTitle},
+			#{applyTo},
+			#{suportCompany},
+			#{sort},
+			#{img},
+			#{type},
+			#{link},
+			#{linkType},
+			#{status},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_recommend SET 	
+			title = #{title},
+			sub_title = #{subTitle},
+			apply_to = #{applyTo},
+			suport_company = #{suportCompany},
+			sort = #{sort},
+			img = #{img},
+			type = #{type},
+			link = #{link},
+			link_type = #{linkType},
+			status = #{status},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_recommend SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

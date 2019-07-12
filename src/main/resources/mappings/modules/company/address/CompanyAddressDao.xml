@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.company.dao.address.CompanyAddressDao">
+    
+	<sql id="companyAddressColumns">
+		a.id AS "id",
+		a.company_id AS "companyId",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.province AS "province",
+		a.city AS "city",
+		a.area AS "area",
+
+		a.address AS "address",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="companyAddressJoins">
+		LEFT JOIN sys_area a5 ON a5.id = a.province
+		LEFT JOIN sys_area a6 ON a6.id = a.city
+		LEFT JOIN sys_area a7 ON a7.id = a.area
+	</sql>
+    
+	<select id="get" resultType="CompanyAddress">
+		SELECT 
+			<include refid="companyAddressColumns"/>
+		FROM a_company_address a
+		<include refid="companyAddressJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CompanyAddress">
+		SELECT 
+			<include refid="companyAddressColumns"/>
+		FROM a_company_address a
+		<include refid="companyAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="selectByCompanyId" resultType="CompanyAddress">
+		SELECT
+			<include refid="companyAddressColumns"/>
+		FROM a_company_address a
+		<include refid="companyAddressJoins"/>
+		where
+			a.del_flag = '0'
+
+		 and company_id=#{id}
+
+
+
+				ORDER BY a.update_date DESC
+
+
+	</select>
+
+	<select id="findAllList" resultType="CompanyAddress">
+		SELECT 
+			<include refid="companyAddressColumns"/>
+		FROM a_company_address a
+		<include refid="companyAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_company_address(
+			id,
+			company_id,
+			name,
+			phone,
+			province,
+			city,
+			area,
+			address,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{companyId},
+			#{name},
+			#{phone},
+			#{province},
+			#{city},
+			#{area},
+			#{address},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_company_address SET 	
+			company_id = #{companyId},
+			name = #{name},
+			phone = #{phone},
+			province = #{province},
+			city = #{city},
+			area = #{area},
+			address = #{address},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_company_address SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.account.dao.accountstudent.AccountStudentinfoDao">
+    
+	<sql id="accountStudentinfoColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.school_id AS "schoolId",
+
+		s.name AS "schoolName",
+
+		a.nickname AS "nickname",
+		a.avatar AS "avatar",
+		a.realname AS "realname",
+		a.phone AS "phone",
+		s.name AS "school",
+		a.school_change_time AS "schoolChangeTime",
+		a.name_change_time AS "nameChangeTime",
+		a.department AS "department",
+		a.education_background AS "educationBackground",
+		a.major AS "major",
+
+		m.name AS "majorName",
+
+		a.sex AS "sex",
+		a.birthday AS "birthday",
+		a.graduation_time AS "graduationTime",
+		a.id_card AS "idCard",
+		a.id_card_status AS "idCardStatus",
+		a.student_id AS "studentId",
+		a.student_id_status AS "studentIdStatus",
+		a.email AS "email",
+		a.incumbency AS "incumbency",
+		a.coin AS "coin",
+		a.collect AS "collect",
+		a.profession_collect AS "professionCollect",
+		a.remark AS "remark",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="accountStudentinfoJoins">
+		left join a_school s on a.school_id=s.id and s.del_flag='0'
+		left join a_dict_major m on a.major=m.id and m.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="AccountStudentinfo">
+		SELECT 
+			<include refid="accountStudentinfoColumns"/>
+		FROM a_account_studentinfo a
+		<include refid="accountStudentinfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByAccountId" resultType="AccountStudentinfo">
+		SELECT
+			<include refid="accountStudentinfoColumns"/>
+		FROM a_account_studentinfo a
+		<include refid="accountStudentinfoJoins"/>
+		WHERE a.account_id = #{accountId}
+	</select>
+
+	<select id="findList" resultType="AccountStudentinfo">
+		SELECT 
+			<include refid="accountStudentinfoColumns"/>
+		FROM a_account_studentinfo a
+		<include refid="accountStudentinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="schoolId != null and schoolId != ''">
+				AND a.school_id = #{schoolId}
+			</if>
+			<if test="nickname != null and nickname != ''">
+				AND a.nickname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nickname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nickname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nickname},'%')</if>
+			</if>
+			<if test="realname != null and realname != ''">
+				AND a.realname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{realname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{realname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{realname},'%')</if>
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE concat('%',#{phone},'%')
+			</if>
+			<if test="schoolChangeTime != null and schoolChangeTime != ''">
+				AND a.school_change_time = #{schoolChangeTime}
+			</if>
+			<if test="department != null and department != ''">
+				AND a.department = #{department}
+			</if>
+			<if test="educationBackground != null and educationBackground != ''">
+				AND a.education_background = #{educationBackground}
+			</if>
+			<if test="major != null and major != ''">
+				AND a.major = #{major}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND a.id_card = #{idCard}
+			</if>
+			<if test="idCardStatus != null and idCardStatus != ''">
+				AND a.id_card_status = #{idCardStatus}
+			</if>
+			<if test="studentIdStatus != null and studentIdStatus != ''">
+				AND a.student_id_status = #{studentIdStatus}
+			</if>
+			<if test="incumbency != null and incumbency != ''">
+				AND a.incumbency = #{incumbency}
+			</if>
+			<if test="coin != null and coin != ''">
+				AND a.coin = #{coin}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AccountStudentinfo">
+		SELECT 
+			<include refid="accountStudentinfoColumns"/>
+		FROM a_account_studentinfo a
+		<include refid="accountStudentinfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_account_studentinfo(
+			id,
+			account_id,
+			school_id,
+			nickname,
+			avatar,
+			realname,
+			phone,
+			school,
+			school_change_time,
+			name_change_time,
+			department,
+			education_background,
+			major,
+			sex,
+			birthday,
+			graduation_time,
+			id_card,
+			id_card_status,
+			student_id,
+			student_id_status,
+			email,
+			incumbency,
+			coin,
+			collect,
+			profession_collect,
+			remark,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{schoolId},
+			#{nickname},
+			#{avatar},
+			#{realname},
+			#{phone},
+			#{school},
+			#{schoolChangeTime},
+			#{nameChangeTime},
+			#{department},
+			#{educationBackground},
+			#{major},
+			#{sex},
+			#{birthday},
+			#{graduationTime},
+			#{idCard},
+			#{idCardStatus},
+			#{studentId},
+			#{studentIdStatus},
+			#{email},
+			#{incumbency},
+			#{coin},
+			#{collect},
+			#{professionCollect},
+			#{remark},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_account_studentinfo SET 	
+			account_id = #{accountId},
+			school_id = #{schoolId},
+			nickname = #{nickname},
+			avatar = #{avatar},
+			realname = #{realname},
+			phone = #{phone},
+			school = #{school},
+			school_change_time = #{schoolChangeTime},
+			name_change_time = #{nameChangeTime},
+			department = #{department},
+			education_background = #{educationBackground},
+			major = #{major},
+			sex = #{sex},
+			birthday = #{birthday},
+			graduation_time = #{graduationTime},
+			id_card = #{idCard},
+			id_card_status = #{idCardStatus},
+			student_id = #{studentId},
+			student_id_status = #{studentIdStatus},
+			email = #{email},
+			incumbency = #{incumbency},
+			coin = #{coin},
+			collect = #{collect},
+			profession_collect = #{professionCollect},
+			remark = #{remark},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="casLock">
+		UPDATE a_account_studentinfo SET
+			account_id = #{accountId},
+			school_id = #{schoolId},
+			nickname = #{nickname},
+			avatar = #{avatar},
+			realname = #{realname},
+			phone = #{phone},
+			school = #{school},
+			school_change_time = #{schoolChangeTime},
+			name_change_time = #{nameChangeTime},
+			department = #{department},
+			education_background = #{educationBackground},
+			major = #{major},
+			sex = #{sex},
+			birthday = #{birthday},
+			graduation_time = #{graduationTime},
+			id_card = #{idCard},
+			id_card_status = #{idCardStatus},
+			student_id = #{studentId},
+			student_id_status = #{studentIdStatus},
+			email = #{email},
+			incumbency = #{incumbency},
+			coin = #{coin},
+			collect = #{collect},
+			profession_collect = #{professionCollect},
+			remark = #{remark},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+		 and update_date = #{updateDate}
+	</update>
+
+	<update id="delete">
+		UPDATE a_account_studentinfo SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

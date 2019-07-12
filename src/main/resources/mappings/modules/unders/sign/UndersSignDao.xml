@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.unders.dao.sign.UndersSignDao">
+    
+	<sql id="undersSignColumns">
+		a.id AS "id",
+		a.unders_order_id AS "undersOrderId",
+		a.unders_id AS "undersId",
+		a.unders_booth_id AS "undersBoothId",
+		a.company_id AS "companyId",
+		a.company_name AS "companyName",
+		a.email AS "email",
+		a.contact1 AS "contact1",
+		a.phone1 AS "phone1",
+		a.contact2 AS "contact2",
+		a.phone2 AS "phone2",
+		a.content AS "content",
+		a.license AS "license",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		c.name AS "companyhr.companyName",
+
+		d.title AS "unders.title"
+
+
+	</sql>
+	
+	<sql id="undersSignJoins">
+		inner join a_company c on a.company_id=c.id
+		inner join a_interaction_recommend_unders d on a.unders_id=d.id
+
+
+	</sql>
+    
+	<select id="get" resultType="UndersSign">
+		SELECT 
+			<include refid="undersSignColumns"/>
+		FROM a_interaction_recommend_unders_sign a
+		<include refid="undersSignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="selectByOrderId" resultType="UndersSign">
+		SELECT
+			<include refid="undersSignColumns"/>
+		FROM a_interaction_recommend_unders_sign a
+		<include refid="undersSignJoins"/>
+		WHERE a.unders_order_id = #{undersOrderId}
+	</select>
+
+
+	<select id="findList" resultType="UndersSign">
+		SELECT 
+			<include refid="undersSignColumns"/>
+		FROM a_interaction_recommend_unders_sign a
+		<include refid="undersSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="undersOrderId != null and undersOrderId != ''">
+				AND a.unders_order_id = #{undersOrderId}
+			</if>
+			<if test="undersId != null and undersId != ''">
+				AND a.unders_id = #{undersId}
+			</if>
+			<if test="undersBoothId != null and undersBoothId != ''">
+				AND a.unders_booth_id = #{undersBoothId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="email != null and email != ''">
+				AND a.email = #{email}
+			</if>
+			<if test="contact1 != null and contact1 != ''">
+				AND a.contact1 = #{contact1}
+			</if>
+			<if test="phone1 != null and phone1 != ''">
+				AND a.phone1 = #{phone1}
+			</if>
+			<if test="contact2 != null and contact2 != ''">
+				AND a.contact2 = #{contact2}
+			</if>
+			<if test="phone2 != null and phone2 != ''">
+				AND a.phone2 = #{phone2}
+			</if>
+			<if test="content != null and content != ''">
+				AND a.content = #{content}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UndersSign">
+		SELECT 
+			<include refid="undersSignColumns"/>
+		FROM a_interaction_recommend_unders_sign a
+		<include refid="undersSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_recommend_unders_sign(
+			id,
+			unders_order_id,
+			unders_id,
+			unders_booth_id,
+			company_id,
+			company_name,
+			email,
+			contact1,
+			phone1,
+			contact2,
+			phone2,
+			content,
+			license,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{undersOrderId},
+			#{undersId},
+			#{undersBoothId},
+			#{companyId},
+			#{companyName},
+			#{email},
+			#{contact1},
+			#{phone1},
+			#{contact2},
+			#{phone2},
+			#{content},
+			#{license},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_recommend_unders_sign SET 	
+			unders_order_id = #{undersOrderId},
+			unders_id = #{undersId},
+			unders_booth_id = #{undersBoothId},
+			company_id = #{companyId},
+			company_name = #{companyName},
+			email = #{email},
+			contact1 = #{contact1},
+			phone1 = #{phone1},
+			contact2 = #{contact2},
+			phone2 = #{phone2},
+			content = #{content},
+			license = #{license},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_recommend_unders_sign SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

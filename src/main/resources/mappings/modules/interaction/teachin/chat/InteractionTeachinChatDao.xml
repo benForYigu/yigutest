@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.teachin.dao.chat.InteractionTeachinChatDao">
+    
+	<sql id="interactionTeachinChatColumns">
+		a.id AS "id",
+		a.teachin_id AS "teachinId",
+		a.account_id AS "accountId",
+		a.avatar AS "avatar",
+		a.realname AS "realname",
+		a.content AS "content",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionTeachinChatJoins">
+	</sql>
+    
+	<select id="get" resultType="InteractionTeachinChat">
+		SELECT 
+			<include refid="interactionTeachinChatColumns"/>
+		FROM a_interaction_teachin_chat a
+		<include refid="interactionTeachinChatJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionTeachinChat">
+		SELECT 
+			<include refid="interactionTeachinChatColumns"/>
+		FROM a_interaction_teachin_chat a
+		<include refid="interactionTeachinChatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="teachinId != null and teachinId != ''">
+				AND a.teachin_id = #{teachinId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findLists" resultType="com.thinkgem.jeesite.modules.interaction.teachin.entity.chat.Chat">
+		SELECT
+		a.id AS "id",
+		a.teachin_id AS "teachinId",
+		a.account_id AS "accountId",
+		a.avatar AS "avatar",
+		a.realname AS "realname",
+		a.content AS "content",
+		a.create_date AS "createDate"
+		FROM a_interaction_teachin_chat a
+		<include refid="interactionTeachinChatJoins"/>
+		<where>
+			a.del_flag = '0'
+			<if test="teachinId != null and teachinId != ''">
+				AND a.teachin_id = #{teachinId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+		</where>
+
+
+				ORDER BY a.create_date
+
+
+	</select>
+
+	<select id="findAllList" resultType="InteractionTeachinChat">
+		SELECT 
+			<include refid="interactionTeachinChatColumns"/>
+		FROM a_interaction_teachin_chat a
+		<include refid="interactionTeachinChatJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_teachin_chat(
+			id,
+			teachin_id,
+			account_id,
+			avatar,
+			realname,
+			content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{teachinId},
+			#{accountId},
+			#{avatar},
+			#{realname},
+			#{content},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_teachin_chat SET 	
+			teachin_id = #{teachinId},
+			account_id = #{accountId},
+			avatar = #{avatar},
+			realname = #{realname},
+			content = #{content},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_teachin_chat SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

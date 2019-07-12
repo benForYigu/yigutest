@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.order.dao.undersorder.OrderUndersDao">
+    
+	<sql id="orderUndersColumns">
+		a.id AS "id",
+		a.unders_id AS "undersId",
+		a.company_id AS "companyId",
+		a.account_id AS "accountId",
+		a.payment AS "payment",
+		a.pay_time AS "payTime",
+		a.end_time AS "endTime",
+		a.transaction_id AS "transactionId",
+		a.pay_type AS "payType",
+		a.status AS "status",
+		a.voucher AS "voucher",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		h.company_id AS "companyhr.companyId",
+		h.avatar AS "companyhr.avatar",
+		h.realname AS "companyhr.realname",
+		c.name AS "companyhr.companyName",
+
+		ov.id as "invoicesId",
+		ov.id as "orderInvoices.id",
+		ov.status as "orderInvoices.status",
+		ov.account_id AS "orderInvoices.accountId",
+		ov.company_id AS "orderInvoices.companyId",
+		ov.order_id AS "orderInvoices.orderId",
+		ov.name AS "orderInvoices.name",
+		ov.phone AS "orderInvoices.phone",
+		ov.address AS "orderInvoices.address",
+		ov.taxcode AS "orderInvoices.taxcode",
+		ov.company_name AS "orderInvoices.companyName",
+		ov.company_address AS "orderInvoices.companyAddress",
+		ov.company_phone AS "orderInvoices.companyPhone",
+		ov.bank AS "orderInvoices.bank",
+		ov.bank_card AS "orderInvoices.bankCard",
+		ov.img AS "orderInvoices.img",
+
+		b.title AS "unders.title"
+	</sql>
+	
+	<sql id="orderUndersJoins">
+		inner join a_interaction_recommend_unders b on a.unders_id=b.id
+		inner join a_account_companyhr h on a.account_id=h.account_id
+			inner join a_company c on a.company_id=c.id
+			left join a_order_invoices ov on a.id=ov.order_id and ov.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="OrderUnders">
+		SELECT 
+			<include refid="orderUndersColumns"/>
+		FROM a_order_unders a
+		<include refid="orderUndersJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OrderUnders">
+		SELECT 
+			<include refid="orderUndersColumns"/>
+		FROM a_order_unders a
+		<include refid="orderUndersJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="undersId != null and undersId != ''">
+				AND a.unders_id = #{undersId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="payment != null and payment != ''">
+				AND a.payment = #{payment}
+			</if>
+			<if test="payType != null and payType != ''">
+				AND a.pay_type = #{payType}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY FIELD(a.status,1,3,2),a.create_date desc
+			</otherwise>
+		</choose>
+	</select>
+	<select id="otherOrders" resultType="java.util.Map">
+		(SELECT
+		'2' AS type,
+		a.id AS "id",
+		a.payment AS "payment",
+		a.pay_time AS "payTime",
+		b.title AS "title",
+		a.transaction_id AS "transactionId",
+		a.pay_type AS "payType",
+		a.status AS "status",
+		a.create_date AS "createDate",
+		a.voucher AS "voucher",
+		ov.id as "invoicesId"
+
+		FROM a_order_unders a
+		<include refid="orderUndersJoins"/>
+		<where>
+			a.del_flag ='0'
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+		</where>
+		)
+		union all
+		(SELECT
+		'1' AS type,
+		a.id AS "id",
+		a.payment AS "payment",
+		a.pay_time AS "payTime",
+		v.name AS "title",
+
+		a.transaction_id AS "transactionId",
+		a.pay_type AS "payType",
+		a.status AS "status",
+		a.create_date AS "createDate",
+		a.voucher AS "voucher",
+		ov.id as "invoicesId"
+
+
+		FROM a_order_vip a
+		inner join a_account_companyhr h on a.account_id=h.account_id
+		inner join a_company c on a.company_id=c.id
+		inner join a_vip v on a.vip_id=v.id
+		left join a_order_invoices ov on a.id=ov.order_id and ov.del_flag='0'
+		<where>
+			a.del_flag = '0'
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+		</where>
+		)
+		ORDER BY createDate desc,FIELD(status,1,3,2)
+	</select>
+
+	<select id="findAllList" resultType="OrderUnders">
+		SELECT 
+			<include refid="orderUndersColumns"/>
+		FROM a_order_unders a
+		<include refid="orderUndersJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_order_unders(
+			id,
+			unders_id,
+			company_id,
+			account_id,
+			payment,
+			pay_time,
+			end_time,
+			transaction_id,
+			pay_type,
+			status,
+			voucher,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{undersId},
+			#{companyId},
+			#{accountId},
+			#{payment},
+			#{payTime},
+			#{endTime},
+			#{transactionId},
+			#{payType},
+			#{status},
+			#{voucher},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_order_unders SET 	
+			unders_id = #{undersId},
+			company_id = #{companyId},
+			account_id = #{accountId},
+			payment = #{payment},
+			pay_time = #{payTime},
+			end_time = #{endTime},
+			transaction_id = #{transactionId},
+			pay_type = #{payType},
+			status = #{status},
+			voucher = #{voucher},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_order_unders SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

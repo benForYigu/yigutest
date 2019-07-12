@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.order.dao.vip.OrderVipDao">
+    
+	<sql id="orderVipColumns">
+		a.id AS "id",
+		a.company_id AS "companyId",
+		a.account_id AS "accountId",
+		a.vip_id AS "vipId",
+		a.payment AS "payment",
+		a.pay_time AS "payTime",
+		a.end_time AS "endTime",
+		a.transaction_id AS "transactionId",
+		a.pay_type AS "payType",
+		a.voucher AS "voucher",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+
+		v.name AS "vip.name",
+		v.price AS "vip.price",
+		h.company_id AS "companyhr.companyId",
+		h.avatar AS "companyhr.avatar",
+		h.realname AS "companyhr.realname",
+		c.name AS "companyhr.companyName",
+		ov.id as "invoicesId",
+		ov.id as "orderInvoices.id",
+		ov.status as "orderInvoices.status",
+		ov.account_id AS "orderInvoices.accountId",
+		ov.company_id AS "orderInvoices.companyId",
+		ov.order_id AS "orderInvoices.orderId",
+		ov.name AS "orderInvoices.name",
+		ov.phone AS "orderInvoices.phone",
+		ov.address AS "orderInvoices.address",
+		ov.taxcode AS "orderInvoices.taxcode",
+		ov.company_name AS "orderInvoices.companyName",
+		ov.company_address AS "orderInvoices.companyAddress",
+		ov.company_phone AS "orderInvoices.companyPhone",
+		ov.bank AS "orderInvoices.bank",
+		ov.bank_card AS "orderInvoices.bankCard",
+		ov.img AS "orderInvoices.img"
+	</sql>
+	
+	<sql id="orderVipJoins">
+		inner join a_account_companyhr h on a.account_id=h.account_id
+		inner join a_company c on a.company_id=c.id
+		inner join a_vip v on a.vip_id=v.id
+		left join a_order_invoices ov on a.id=ov.order_id and ov.del_flag='0'
+	</sql>
+    
+	<select id="get" resultType="OrderVip">
+		SELECT 
+			<include refid="orderVipColumns"/>
+		FROM a_order_vip a
+		<include refid="orderVipJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getLock" resultType="OrderVip">
+		SELECT
+		<include refid="orderVipColumns"/>
+		FROM a_order_vip a
+		<include refid="orderVipJoins"/>
+		WHERE a.id = #{id} FOR UPDATE
+	</select>
+	<select id="findList" resultType="OrderVip">
+		SELECT 
+			<include refid="orderVipColumns"/>
+		FROM a_order_vip a
+		<include refid="orderVipJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="vipId != null and vipId != ''">
+				AND a.vip_id = #{vipId}
+			</if>
+			<if test="accountId != null and accountId != ''">
+				AND a.account_id = #{accountId}
+			</if>
+			<if test="payType != null and payType != ''">
+				AND a.pay_type = #{payType}
+			</if>
+			<!--<if test="status == null or status == ''.toString()">
+				AND (a.status != '1' )
+			</if>-->
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OrderVip">
+		SELECT 
+			<include refid="orderVipColumns"/>
+		FROM a_order_vip a
+		<include refid="orderVipJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_order_vip(
+			id,
+			company_id,
+			account_id,
+			vip_id,
+			payment,
+			pay_time,
+			end_time,
+			transaction_id,
+			pay_type,
+			voucher,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{companyId},
+			#{accountId},
+			#{vipId},
+			#{payment},
+			#{payTime},
+			#{endTime},
+			#{transactionId},
+			#{payType},
+			#{voucher},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_order_vip SET 	
+			company_id = #{companyId},
+			account_id = #{accountId},
+			vip_id = #{vipId},
+			payment = #{payment},
+			pay_time = #{payTime},
+			end_time = #{endTime},
+			transaction_id = #{transactionId},
+			pay_type = #{payType},
+			voucher = #{voucher},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_order_vip SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

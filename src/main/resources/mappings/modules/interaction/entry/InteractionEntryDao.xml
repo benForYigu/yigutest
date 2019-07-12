@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.interaction.dao.entry.InteractionEntryDao">
+    
+	<sql id="interactionEntryColumns">
+		a.id AS "id",
+		a.student_id AS "studentId",
+		a.company_id AS "companyId",
+		a.conpany_name AS "conpanyName",
+		a.entry_branch AS "entryBranch",
+		a.entry_time AS "entryTime",
+		a.area AS "area",
+		a.sign_time AS "signTime",
+		a.sign_content AS "signContent",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="interactionEntryJoins">
+	</sql>
+    
+	<select id="get" resultType="InteractionEntry">
+		SELECT 
+			<include refid="interactionEntryColumns"/>
+		FROM a_interaction_entry a
+		<include refid="interactionEntryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InteractionEntry">
+		SELECT 
+			<include refid="interactionEntryColumns"/>
+		FROM a_interaction_entry a
+		<include refid="interactionEntryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="studentId != null and studentId != ''">
+				AND a.student_id = #{studentId}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InteractionEntry">
+		SELECT 
+			<include refid="interactionEntryColumns"/>
+		FROM a_interaction_entry a
+		<include refid="interactionEntryJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_entry(
+			id,
+			student_id,
+			company_id,
+			conpany_name,
+			entry_branch,
+			entry_time,
+			area,
+			sign_time,
+			sign_content,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{studentId},
+			#{companyId},
+			#{conpanyName},
+			#{entryBranch},
+			#{entryTime},
+			#{area},
+			#{signTime},
+			#{signContent},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_entry SET 	
+			student_id = #{studentId},
+			company_id = #{companyId},
+			conpany_name = #{conpanyName},
+			entry_branch = #{entryBranch},
+			entry_time = #{entryTime},
+			area = #{area},
+			sign_time = #{signTime},
+			sign_content = #{signContent},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_entry SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

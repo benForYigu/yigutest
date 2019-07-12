@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.appconfig.dao.AppConfigDao">
+    
+	<sql id="appConfigColumns">
+		a.id AS "id",
+		a.version AS "version",
+		a.name AS "name",
+		a.config_type AS "configType",
+		a.title AS "title",
+		a.content AS "content",
+		a.url AS "url",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="appConfigJoins">
+	</sql>
+    
+	<select id="get" resultType="AppConfig">
+		SELECT 
+			<include refid="appConfigColumns"/>
+		FROM a_app_config a
+		<include refid="appConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="AppConfig">
+		SELECT 
+			<include refid="appConfigColumns"/>
+		FROM a_app_config a
+		<include refid="appConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="version != null and version != ''">
+				AND a.version LIKE 
+					<if test="dbName == 'oracle'">'%'||#{version}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{version}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{version},'%')</if>
+			</if>
+
+			<if test="configType != null and configType != ''">
+				AND a.config_type = #{configType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AppConfig">
+		SELECT 
+			<include refid="appConfigColumns"/>
+		FROM a_app_config a
+		<include refid="appConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_app_config(
+			id,
+			version,
+			name,
+			config_type,
+			title,
+			content,
+			url,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{version},
+			#{name},
+			#{configType},
+			#{title},
+			#{content},
+			#{url},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_app_config SET 	
+			version = #{version},
+			name = #{name},
+			config_type = #{configType},
+			title = #{title},
+			content = #{content},
+			url = #{url},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_app_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.unders.dao.companyfile.UndersCompanyFileDao">
+    
+	<sql id="undersCompanyFileColumns">
+		a.id AS "id",
+		a.company_id AS "companyId",
+		a.company_name AS "companyName",
+		a.email AS "email",
+		a.contact1 AS "contact1",
+		a.phone1 AS "phone1",
+		a.contact2 AS "contact2",
+		a.phone2 AS "phone2",
+		a.content AS "content",
+		a.license AS "license",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="undersCompanyFileJoins">
+	</sql>
+    
+	<select id="get" resultType="UndersCompanyFile">
+		SELECT 
+			<include refid="undersCompanyFileColumns"/>
+		FROM a_interaction_recommend_unders_company_file a
+		<include refid="undersCompanyFileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="selectByCompanyId" resultType="UndersCompanyFile">
+		SELECT
+			<include refid="undersCompanyFileColumns"/>
+		FROM a_interaction_recommend_unders_company_file a
+		<include refid="undersCompanyFileJoins"/>
+
+		where a.company_id=#{id}
+	</select>
+
+	<select id="findList" resultType="UndersCompanyFile">
+		SELECT 
+			<include refid="undersCompanyFileColumns"/>
+		FROM a_interaction_recommend_unders_company_file a
+		<include refid="undersCompanyFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UndersCompanyFile">
+		SELECT 
+			<include refid="undersCompanyFileColumns"/>
+		FROM a_interaction_recommend_unders_company_file a
+		<include refid="undersCompanyFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO a_interaction_recommend_unders_company_file(
+			id,
+			company_id,
+			company_name,
+			email,
+			contact1,
+			phone1,
+			contact2,
+			phone2,
+			content,
+			license,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{companyId},
+			#{companyName},
+			#{email},
+			#{contact1},
+			#{phone1},
+			#{contact2},
+			#{phone2},
+			#{content},
+			#{license},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE a_interaction_recommend_unders_company_file SET 	
+			company_id = #{companyId},
+			company_name = #{companyName},
+			email = #{email},
+			contact1 = #{contact1},
+			phone1 = #{phone1},
+			contact2 = #{contact2},
+			phone2 = #{phone2},
+			content = #{content},
+			license = #{license},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE a_interaction_recommend_unders_company_file SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
